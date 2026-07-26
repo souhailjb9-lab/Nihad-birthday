@@ -318,17 +318,24 @@
         // دالة إرسال الاسم إلى قاعدة البيانات
      
 
-        
-sendBtn.addEventListener('click', () => {
+        sendBtn.addEventListener('click', () => {
     const name = inputField.value.trim();
 
-    // --- كود حظر الأسماء ---
-    const blockedNames = ["Nihad", "nina", "nihadita", "nihade"];
-    if (blockedNames.includes(name)) {
-        alert("عذراً، غير مسموح بإضافة هذا الاسم!");
-        return;
+    // --- كود حظر الأسماء المطور (يمنع التحايل) ---
+    // تحويل الاسم لحروف صغيرة وإزالة كل المسافات لسهولة الفحص
+    const cleanName = name.toLowerCase().replace(/\s/g, ''); 
+    
+    // ضع الكلمات الممنوعة هنا (يجب أن تكتبها دائماً بحروف صغيرة small letters)
+    const blockedWords = ["nihad", "nina"]; 
+    
+    // فحص ما إذا كان الاسم الذي كتبه الشخص "يحتوي" على الكلمات الممنوعة
+    const isBlocked = blockedWords.some(word => cleanName.includes(word));
+
+    if (isBlocked) {
+        alert("عذراً، غير مسموح بإضافة هذا الاسم أو أي شكل مشابه له!");
+        return; // إيقاف العملية
     }
-    // ------------------------
+    // ----------------------------------------------
 
     if (name !== "") {
         // دفع الاسم إلى Firebase
@@ -339,6 +346,7 @@ sendBtn.addEventListener('click', () => {
         confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
     }
 });
+
 
         // دالة استماع للتغيرات في قاعدة البيانات وعرضها فوراً
         onValue(namesRef, (snapshot) => {
