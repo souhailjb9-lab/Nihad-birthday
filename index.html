@@ -316,34 +316,29 @@
         const namesRef = ref(database, 'celebrators');
 
         // دالة إرسال الاسم إلى قاعدة البيانات
-        sendBtn.addEventListener('click', () => {
-            const name = inputField.value.trim();
-            sendBtn.addEventListener('click', () => {
-    const name = inputField.value.trim(); // هذا هو السطر 320
+     
 
-    // --- كود حظر الأسماء (تضعه هنا) ---
-    const blockedNames = ["Nihad", "nina" , "nihadita" , "nihade"]; 
+        
+sendBtn.addEventListener('click', () => {
+    const name = inputField.value.trim();
+
+    // --- كود حظر الأسماء ---
+    const blockedNames = ["Nihad", "nina", "nihadita", "nihade"];
     if (blockedNames.includes(name)) {
         alert("عذراً، غير مسموح بإضافة هذا الاسم!");
-        return; 
+        return;
     }
-    // -----------------------------------
+    // ------------------------
 
-    if (name !== "") { // هذا كان السطر 321
+    if (name !== "") {
         // دفع الاسم إلى Firebase
         push(namesRef, { text: name });
-        
-        // تفريغ الحقل وتشغيل مفرقعات...
-        
-            if (name !== "") {
-                // دفع الاسم إلى Firebase
-                push(namesRef, { text: name });
-                
-                // تفريغ الحقل وتشغيل مفرقعات صغيرة للمستخدم
-                inputField.value = "";
-                confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 }, colors: ['#ff007f', '#00bfff'] });
-            }
-        });
+
+        // تفريغ الحقل وتشغيل مفرقعات صغيرة للمستخدم
+        inputField.value = "";
+        confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+    }
+});
 
         // دالة استماع للتغيرات في قاعدة البيانات وعرضها فوراً
         onValue(namesRef, (snapshot) => {
