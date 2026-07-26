@@ -318,22 +318,26 @@
         // دالة إرسال الاسم إلى قاعدة البيانات
      
 
-        sendBtn.addEventListener('click', () => {
+        // --- 1. التحقق عند دخول الموقع (لمنع تفعيل الزر إذا أرسل مسبقاً) ---
+if (localStorage.getItem('hasSubmitted') === 'true') {
+    sendBtn.disabled = true;
+    sendBtn.style.opacity = '0.5'; 
+    sendBtn.style.cursor = 'not-allowed'; 
+    sendBtn.innerText = 'تم الإرسال'; 
+}
+
+// --- 2. حدث الضغط على زر الإرسال ---
+sendBtn.addEventListener('click', () => {
     const name = inputField.value.trim();
 
     // --- كود حظر الأسماء المطور (يمنع التحايل) ---
-    // تحويل الاسم لحروف صغيرة وإزالة كل المسافات لسهولة الفحص
     const cleanName = name.toLowerCase().replace(/\s/g, ''); 
-    
-    // ضع الكلمات الممنوعة هنا (يجب أن تكتبها دائماً بحروف صغيرة small letters)
     const blockedWords = ["nihad", "nina"]; 
-    
-    // فحص ما إذا كان الاسم الذي كتبه الشخص "يحتوي" على الكلمات الممنوعة
     const isBlocked = blockedWords.some(word => cleanName.includes(word));
 
     if (isBlocked) {
         alert("عذراً، غير مسموح بإضافة هذا الاسم أو أي شكل مشابه له!");
-        return; // إيقاف العملية
+        return; 
     }
     // ----------------------------------------------
 
@@ -341,11 +345,19 @@
         // دفع الاسم إلى Firebase
         push(namesRef, { text: name });
 
-        // تفريغ الحقل وتشغيل مفرقعات صغيرة للمستخدم
+        // تفريغ الحقل وتشغيل مفرقعات
         inputField.value = "";
         confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+
+        // --- 3. قفل الزر وتغيير شكله بعد الإرسال الناجح ---
+        localStorage.setItem('hasSubmitted', 'true');
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = '0.5'; 
+        sendBtn.style.cursor = 'not-allowed';
+        sendBtn.innerText = 'تم الإرسال'; 
     }
 });
+
 
 
         // دالة استماع للتغيرات في قاعدة البيانات وعرضها فوراً
