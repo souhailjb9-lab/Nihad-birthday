@@ -318,6 +318,23 @@
         // دالة إرسال الاسم إلى قاعدة البيانات
         sendBtn.addEventListener('click', () => {
             const name = inputField.value.trim();
+            sendBtn.addEventListener('click', () => {
+    const name = inputField.value.trim(); // هذا هو السطر 320
+
+    // --- كود حظر الأسماء (تضعه هنا) ---
+    const blockedNames = ["Nihad", "nina" , "nihadita" , "nihade"]; 
+    if (blockedNames.includes(name)) {
+        alert("عذراً، غير مسموح بإضافة هذا الاسم!");
+        return; 
+    }
+    // -----------------------------------
+
+    if (name !== "") { // هذا كان السطر 321
+        // دفع الاسم إلى Firebase
+        push(namesRef, { text: name });
+        
+        // تفريغ الحقل وتشغيل مفرقعات...
+        
             if (name !== "") {
                 // دفع الاسم إلى Firebase
                 push(namesRef, { text: name });
