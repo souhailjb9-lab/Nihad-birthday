@@ -318,7 +318,9 @@
         // دالة إرسال الاسم إلى قاعدة البيانات
      
 
-        // --- 1. التحقق عند دخول الموقع (لمنع تفعيل الزر إذا أرسل مسبقاً) ---
+        // --- 1. التحقق عند دخول الموقع (لمنع تفعيل الزر إذا أرسل مسبقاً)
+
+// --- 1. التحقق عند دخول الموقع لتعطيل الزر إذا كان قد أرسل ---
 if (localStorage.getItem('hasSubmitted') === 'true') {
     sendBtn.disabled = true;
     sendBtn.style.opacity = '0.5'; 
@@ -326,11 +328,42 @@ if (localStorage.getItem('hasSubmitted') === 'true') {
     sendBtn.innerText = 'تم الإرسال'; 
 }
 
-// --- 2. حدث الضغط على زر الإرسال ---
+// --- 2. ميزة المراقبة الذكية: فتح الزر تلقائياً إذا قمت أنت بحذف الاسم ---
+onValue(namesRef, (snapshot) => {
+    const myKey = localStorage.getItem('submissionKey');
+    
+    // إذا كان الشخص قد أرسل اسماً مسبقاً ولديه "معرف" محفوظ
+    if (myKey) {
+        let keyStillExists = false;
+        
+        // نبحث في كل الأسماء الموجودة في فايربيز حالياً
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                if (childSnapshot.key === myKey) {
+                    keyStillExists = true; // الاسم لا يزال موجوداً
+                }
+            });
+        }
+        
+        // إذا بحثنا ولم نجد المعرف (أي أنك قمت بحذفه من قاعدة البيانات)
+        if (!keyStillExists) {
+            // نمسح الذاكرة المحفوظة محلياً ونعيد الزر ليعمل من جديد
+            localStorage.removeItem('hasSubmitted');
+            localStorage.removeItem('submissionKey');
+            
+            sendBtn.disabled = false;
+            sendBtn.style.opacity = '1';
+            sendBtn.style.cursor = 'pointer';
+            sendBtn.innerText = 'إرسال'; 
+        }
+    }
+});
+
+// --- 3. حدث الضغط على زر الإرسال ---
 sendBtn.addEventListener('click', () => {
     const name = inputField.value.trim();
 
-    // --- كود حظر الأسماء المطور (يمنع التحايل) ---
+    // كود حظر الأسماء المطور
     const cleanName = name.toLowerCase().replace(/\s/g, ''); 
     const blockedWords = ["nihad", "nina"]; 
     const isBlocked = blockedWords.some(word => cleanName.includes(word));
@@ -339,17 +372,17 @@ sendBtn.addEventListener('click', () => {
         alert("عذراً، غير مسموح بإضافة هذا الاسم أو أي شكل مشابه له!");
         return; 
     }
-    // ----------------------------------------------
 
     if (name !== "") {
-        // دفع الاسم إلى Firebase
-        push(namesRef, { text: name });
+        // دفع الاسم إلى Firebase واستخراج المعرف الخاص به (Key) لحفظه
+        const newNameRef = push(namesRef, { text: name });
+        localStorage.setItem('submissionKey', newNameRef.key); 
 
-        // تفريغ الحقل وتشغيل مفرقعات
+        // تفريغ الحقل وتشغيل مفرقعات (تأكد أن مكتبة confetti موجودة لديك)
         inputField.value = "";
         confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
 
-        // --- 3. قفل الزر وتغيير شكله بعد الإرسال الناجح ---
+        // قفل الزر بعد الإرسال
         localStorage.setItem('hasSubmitted', 'true');
         sendBtn.disabled = true;
         sendBtn.style.opacity = '0.5'; 
@@ -357,7 +390,6 @@ sendBtn.addEventListener('click', () => {
         sendBtn.innerText = 'تم الإرسال'; 
     }
 });
-
 
 
         // دالة استماع للتغيرات في قاعدة البيانات وعرضها فوراً
