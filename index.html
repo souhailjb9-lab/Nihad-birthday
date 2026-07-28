@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nihad Birthday Countdown</title>
     
-    <!-- استدعاء الخطوط -->
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
+    <!-- استدعاء الخطوط (بما في ذلك خط Cairo لدعم العربية) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&family=Great+Vibes&family=Oswald:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- مكتبة المفرقعات -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -21,7 +21,7 @@
         body {
             background-color: #050505;
             color: #fff;
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Oswald', 'Cairo', sans-serif;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -59,7 +59,7 @@
         /* مربع المؤقت */
         .timer-box { display: flex; justify-content: center; align-items: center; border: 2px solid #ffd700; border-radius: 15px; padding: 15px 10px; background: rgba(20, 20, 20, 0.8); box-shadow: 0 0 15px #ffd700, inset 0 0 10px #ffd700; width: 100%; max-width: 500px; margin-bottom: 20px; }
         .time-section { display: flex; flex-direction: column; align-items: center; flex: 1; }
-        .time-section span.number { font-size: 3rem; font-weight: 500; line-height: 1.1; }
+        .time-section span.number { font-size: 3rem; font-weight: 500; line-height: 1.1; font-family: 'Oswald', sans-serif; }
         .time-section span.label { font-size: 0.7rem; color: #ccc; margin-top: 5px; letter-spacing: 1px; }
         .colon { font-size: 2rem; color: #fff; margin: 0 5px; padding-bottom: 15px; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -78,7 +78,6 @@
         }
 
         .friends-title {
-            font-family: 'Oswald', sans-serif;
             font-size: 1.1rem;
             color: #00bfff;
             margin-bottom: 10px;
@@ -98,7 +97,7 @@
             border: 1px solid #ff007f;
             background: rgba(10, 10, 10, 0.7);
             color: #fff;
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Oswald', 'Cairo', sans-serif;
             font-size: 1rem;
             outline: none;
             width: 70%;
@@ -113,7 +112,7 @@
             border: none;
             background: linear-gradient(45deg, #ff007f, #9933ff);
             color: #fff;
-            font-family: 'Oswald', sans-serif;
+            font-family: 'Oswald', 'Cairo', sans-serif;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
@@ -128,8 +127,8 @@
             border: 1px solid #ffd700;
             border-radius: 15px;
             padding: 15px;
-            height: 120px; /* ارتفاع ثابت */
-            overflow-y: auto; /* شريط تمرير عند زيادة الأسماء */
+            height: 120px;
+            overflow-y: auto; 
             box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);
             scrollbar-width: thin;
             scrollbar-color: #ffd700 #222;
@@ -151,6 +150,7 @@
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.9rem;
+            font-family: 'Oswald', 'Cairo', sans-serif;
             border: 1px solid #ffdf00;
             box-shadow: 0 0 5px rgba(255, 223, 0, 0.5);
             animation: popIn 0.3s ease-out;
@@ -206,7 +206,8 @@
         <div class="friends-section">
             <p class="friends-title">Send your name to celebrate with Nihad ✨</p>
             <div class="input-group">
-                <input type="text" id="friendNameInput" placeholder="Your name..." maxlength="20">
+                <!-- إضافة dir="auto" ليتم ضبط اتجاه الكتابة حسب اللغة تلقائياً -->
+                <input type="text" id="friendNameInput" placeholder="Your name / اسمك..." maxlength="20" dir="auto">
                 <button id="sendNameBtn">Send</button>
             </div>
             <div class="friends-list-container" id="listContainer">
@@ -224,7 +225,7 @@
 
     <!-- سكريبت المؤقت الأساسي -->
     <script>
-        const targetDate = new Date("2026-08-06T23:59:59").getTime();
+        const targetDate = new Date("2026-08-17T00:00:00").getTime();
 
         function subtleFireworks() {
             if (!document.getElementById('main-container').classList.contains('hidden')) {
@@ -285,12 +286,12 @@
         updateTimer();
     </script>
 
-    <!-- سكريبت ربط Firebase (مستقل ليعمل بشكل سليم) -->
+    <!-- سكريبت ربط Firebase المحدث للمشروع -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getDatabase, ref, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        // إعدادات Firebase الخاصة بك
+        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCo2csN5fYJsJSJPLCR1b2L_p8rZ31Hbf0",
             authDomain: "nihad-birthday.firebaseapp.com",
@@ -302,117 +303,125 @@
             measurementId: "G-4TN46C9RSW"
         };
 
-        // تهيئة Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         
-        // المراجع (References) للعناصر في الصفحة
         const inputField = document.getElementById('friendNameInput');
         const sendBtn = document.getElementById('sendNameBtn');
         const friendsList = document.getElementById('friendsListDisplay');
         const listContainer = document.getElementById('listContainer');
         
-        // المرجع لقاعدة البيانات
-        const namesRef = ref(database, 'celebrators');
+        const namesRef = ref(database, 'nihad_celebrators');
 
-        // دالة إرسال الاسم إلى قاعدة البيانات
-     
-
-        // --- 1. التحقق عند دخول الموقع (لمنع تفعيل الزر إذا أرسل مسبقاً)
-
-// --- 1. التحقق عند دخول الموقع لتعطيل الزر إذا كان قد أرسل ---
-if (localStorage.getItem('hasSubmitted') === 'true') {
-    sendBtn.disabled = true;
-    sendBtn.style.opacity = '0.5'; 
-    sendBtn.style.cursor = 'not-allowed'; 
-    sendBtn.innerText = 'تم الإرسال'; 
-}
-
-// --- 2. ميزة المراقبة الذكية: فتح الزر تلقائياً إذا قمت أنت بحذف الاسم ---
-onValue(namesRef, (snapshot) => {
-    const myKey = localStorage.getItem('submissionKey');
-    
-    // إذا كان الشخص قد أرسل اسماً مسبقاً ولديه "معرف" محفوظ
-    if (myKey) {
-        let keyStillExists = false;
-        
-        // نبحث في كل الأسماء الموجودة في فايربيز حالياً
-        if (snapshot.exists()) {
-            snapshot.forEach((childSnapshot) => {
-                if (childSnapshot.key === myKey) {
-                    keyStillExists = true; // الاسم لا يزال موجوداً
-                }
-            });
+        // --- 1. التحقق عند الدخول ---
+        if (localStorage.getItem('hasSubmitted') === 'true') {
+            sendBtn.disabled = true;
+            sendBtn.style.opacity = '0.5'; 
+            sendBtn.style.cursor = 'not-allowed'; 
+            sendBtn.innerText = 'تم الإرسال'; 
         }
-        
-        // إذا بحثنا ولم نجد المعرف (أي أنك قمت بحذفه من قاعدة البيانات)
-        if (!keyStillExists) {
-            // نمسح الذاكرة المحفوظة محلياً ونعيد الزر ليعمل من جديد
-            localStorage.removeItem('hasSubmitted');
-            localStorage.removeItem('submissionKey');
-            
-            sendBtn.disabled = false;
-            sendBtn.style.opacity = '1';
-            sendBtn.style.cursor = 'pointer';
-            sendBtn.innerText = 'إرسال'; 
-        }
-    }
-});
 
-// --- 3. حدث الضغط على زر الإرسال ---
-sendBtn.addEventListener('click', () => {
-    const name = inputField.value.trim();
-
-    // كود حظر الأسماء المطور
-    const cleanName = name.toLowerCase().replace(/\s/g, ''); 
-    const blockedWords = ["nihad", "nina"]; 
-    const isBlocked = blockedWords.some(word => cleanName.includes(word));
-
-    if (isBlocked) {
-        alert("عذراً، غير مسموح بإضافة هذا الاسم أو أي شكل مشابه له!");
-        return; 
-    }
-
-    if (name !== "") {
-        // دفع الاسم إلى Firebase واستخراج المعرف الخاص به (Key) لحفظه
-        const newNameRef = push(namesRef, { text: name });
-        localStorage.setItem('submissionKey', newNameRef.key); 
-
-        // تفريغ الحقل وتشغيل مفرقعات (تأكد أن مكتبة confetti موجودة لديك)
-        inputField.value = "";
-        confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
-
-        // قفل الزر بعد الإرسال
-        localStorage.setItem('hasSubmitted', 'true');
-        sendBtn.disabled = true;
-        sendBtn.style.opacity = '0.5'; 
-        sendBtn.style.cursor = 'not-allowed';
-        sendBtn.innerText = 'تم الإرسال'; 
-    }
-});
-
-
-        // دالة استماع للتغيرات في قاعدة البيانات وعرضها فوراً
+        // --- 2. المراقبة الذكية لزر الإرسال ---
         onValue(namesRef, (snapshot) => {
-            friendsList.innerHTML = ""; // مسح القائمة القديمة لتحديثها
+            const myKey = localStorage.getItem('submissionKey');
+            
+            if (myKey) {
+                let keyStillExists = false;
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        if (childSnapshot.key === myKey) {
+                            keyStillExists = true;
+                        }
+                    });
+                }
+                if (!keyStillExists) {
+                    localStorage.removeItem('hasSubmitted');
+                    localStorage.removeItem('submissionKey');
+                    
+                    sendBtn.disabled = false;
+                    sendBtn.style.opacity = '1';
+                    sendBtn.style.cursor = 'pointer';
+                    sendBtn.innerText = 'Send'; 
+                }
+            }
+        });
+
+        // --- 3. حدث الضغط على زر الإرسال ---
+        sendBtn.addEventListener('click', async () => {
+            const name = inputField.value.trim();
+
+            if (name === "") return;
+
+            const cleanName = name.toLowerCase();
+
+            // حظر اسم صاحبة العيد ميلاد
+            const blockedWords = ["nihad", "نهاد", "nehad"]; 
+            const isBlocked = blockedWords.some(word => cleanName.replace(/\s/g, '').includes(word));
+
+            if (isBlocked) {
+                alert("لا يمكنك إضافة اسم 'نهاد' هنا، فهي صاحبة عيد الميلاد!");
+                return; 
+            }
+
+            try {
+                // منع التكرار المطابق تماماً
+                const snapshot = await get(namesRef);
+                let nameExists = false;
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const data = childSnapshot.val();
+                        const existingName = (data.text || data.name || "").trim().toLowerCase();
+                        if (existingName === cleanName) {
+                            nameExists = true;
+                        }
+                    });
+                }
+
+                if (nameExists) {
+                    alert("هذا الاسم موجود بالفعل في القائمة! يرجى إضافة اسمك العائلي أو لقب للتمييز.");
+                    return;
+                }
+
+                // إضافة الاسم بنجاح
+                const newNameRef = push(namesRef, { text: name });
+                localStorage.setItem('submissionKey', newNameRef.key); 
+
+                inputField.value = "";
+                confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
+
+                localStorage.setItem('hasSubmitted', 'true');
+                sendBtn.disabled = true;
+                sendBtn.style.opacity = '0.5'; 
+                sendBtn.style.cursor = 'not-allowed';
+                sendBtn.innerText = 'تم الإرسال'; 
+
+            } catch (error) {
+                console.error("حدث خطأ أثناء الاتصال بقاعدة البيانات:", error);
+            }
+        });
+
+        // دالة عرض الأسماء من قاعدة البيانات
+        onValue(namesRef, (snapshot) => {
+            friendsList.innerHTML = ""; 
             const emojis = ['🎉', '🎈', '✨', '🎂', '🥳', '🎁', '💖'];
             
-            snapshot.forEach((childSnapshot) => {
-                const data = childSnapshot.val();
-                
-                // إنشاء شارة (Badge) جديدة
-                const newBadge = document.createElement('span');
-                newBadge.className = 'friend-badge';
-                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                
-                newBadge.innerText = data.text + ' ' + randomEmoji;
-                friendsList.appendChild(newBadge);
-            });
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    
+                    const newBadge = document.createElement('span');
+                    newBadge.className = 'friend-badge';
+                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    
+                    newBadge.innerText = (data.text || data.name) + ' ' + randomEmoji;
+                    friendsList.appendChild(newBadge);
+                });
+            }
 
-            // التمرير التلقائي لأسفل الصندوق لرؤية أحدث الأسماء المضافة
             listContainer.scrollTop = listContainer.scrollHeight;
         });
     </script>
 </body>
-                  </html>
-                  
+    </html>
+    
