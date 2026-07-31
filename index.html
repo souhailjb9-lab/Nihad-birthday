@@ -287,8 +287,12 @@
     </script>
 
     <!-- سكريبت ربط Firebase المحدث للمشروع -->
+
+        <!-- سكريبت ربط Firebase المحدث للمشروع -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        /* السطر الجديد الأول (استدعاء الإحصائيات) */
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
         import { getDatabase, ref, push, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         // إعدادات Firebase
@@ -304,7 +308,10 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        /* السطر الجديد الثاني (تشغيل الإحصائيات) */
+        const analytics = getAnalytics(app);
         const database = getDatabase(app);
+
         
         const inputField = document.getElementById('friendNameInput');
         const sendBtn = document.getElementById('sendNameBtn');
